@@ -7,6 +7,7 @@
 #include <iostream>
 #include <tuple>
 #include <utility>
+#include <vector>
 
 using namespace std;
 
@@ -17,6 +18,7 @@ private:
     string _lastName;       //фамилия
     string _firstName;      //имя
     string _patronymic;     //отчество
+
 public:
     //Конструкторы
     Person() : _lastName(""), _firstName(""), _patronymic("") {}
@@ -53,6 +55,7 @@ private:
     int16_t _cityCode;          //код города
     string _phoneNumber;        //номер телефона
     int16_t _extensionNumber;   //добавочный номер
+
 public:
     //Конструкторы
     PhoneNumber() : _countryCode(0), _cityCode(0), _phoneNumber(""), _extensionNumber(0) {}
@@ -82,6 +85,19 @@ public:
         out << "\tНомер телефона: " << phoneNumber._countryCode << " " << phoneNumber._cityCode
             << " " << phoneNumber._phoneNumber << " " << phoneNumber._extensionNumber << endl;
         return out;
+    }
+};
+
+//Класс Телефонная книга
+class PhoneBook
+{
+private:
+    vector<pair<Person, PhoneNumber>> _personPhone;     //
+
+public:
+    PhoneBook(Person person, PhoneNumber phoneNumber)
+    {
+        //_personPhone.push_back();
     }
 };
 
