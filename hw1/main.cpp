@@ -42,6 +42,11 @@ public:
         return tie(person_1._lastName, person_1._firstName, person_1._patronymic) ==
                 tie(person_2._lastName, person_2._firstName, person_2._patronymic);
     }
+    //Прегружаем оператор ==
+    friend bool operator== (const Person& person, const string& lastName)
+    {
+        return person._lastName == lastName;
+    }
     //Прегружаем оператор <<
     friend ostream& operator<< (ostream &out, const Person& person)
     {
@@ -148,14 +153,27 @@ public:
              {return line1.second < line2.second;});
     }
     //Получить номер (по фамилии)
-    void GetPhoneNumber()
+    pair<string, string> GetPhoneNumber(const string& _lastName)
     {
-
+        for(const auto& phoneBookLine: _personPhone)
+        {
+            if (phoneBookLine.first == _lastName)
+            {
+                stringstream ss;
+                ss << phoneBookLine.second;
+                return make_pair(ss.str(), _lastName);
+            }
+        }
+        return make_pair("", "not found");
     }
     //Изменить номер
     void ChangePhoneNumber(const Person& person, const PhoneNumber& phoneNumber)
     {
-
+        for (auto& phoneBookLine: _personPhone)
+        {
+            if (phoneBookLine.first == person)
+                phoneBookLine.second = phoneNumber;
+        }
     }
     //Прегружаем оператор <<
     friend ostream& operator<< (ostream &out, const PhoneBook& phoneBook)
@@ -175,7 +193,7 @@ int main()
     vector<Person> persons
     {
         {"Ivanov", "Ivan", "Ivanovich"},
-        {"Petrov", "Petr", "Petrovich"},
+        {"Sidorov", "Petr", "Petrovich"},
         {"Kotov", "Vasilii", "Eliseevich"},
         {"Mironova", "Margarita", "Vladimirovna"}
     };
@@ -192,7 +210,7 @@ int main()
 
     for (int i = 0; i < persons.size(); i++)
     {
-        cout << "\t" << persons[i] << "\t" << phoneNumbers[i] << endl;
+        cout << persons[i] << "\t" << phoneNumbers[i] << endl;
         out << persons[i] << "\t" << phoneNumbers[i] << endl;
     }
 
@@ -212,27 +230,27 @@ int main()
     book.SortByName();
     cout << book;
 
-//    cout << "-----GetPhoneNumber-----" << endl;
-//    // лямбда функция, которая принимает фамилию и выводит номер телефона человека,
-//    // либо строку с ошибкой
-//    auto print_phone_number = [&book](const string& surname)
-//    {
-//        cout << surname << "\t";
-//        auto answer = book.GetPhoneNumber(surname);
-//        if (get<0>(answer).empty())
-//            cout << get<1>(answer);
-//        else
-//            cout << get<0>(answer);
-//        cout << endl;
-//    };
-//    // вызовы лямбды
-//    print_phone_number("Ivanov");
-//    print_phone_number("Petrov");
-//
-//    cout << "----ChangePhoneNumber----" << endl;
-//    book.ChangePhoneNumber(Person{ "Kotov", "Vasilii", "Eliseevich" },
-//                           PhoneNumber{7, 123, "15344458", nullopt});
-//    book.ChangePhoneNumber(Person{ "Mironova", "Margarita", "Vladimirovna" },
-//                           PhoneNumber{ 16, 465, "9155448", 13 });
-//    cout << book;
+    cout << "-----GetPhoneNumber-----" << endl;
+    // лямбда функция, которая принимает фамилию и выводит номер телефона человека,
+    // либо строку с ошибкой
+    auto print_phone_number = [&book](const string& surname)
+    {
+        cout << surname << "\t";
+        auto answer = book.GetPhoneNumber(surname);
+        if (get<0>(answer).empty())
+            cout << get<1>(answer);
+        else
+            cout << get<0>(answer);
+        cout << endl;
+    };
+    // вызовы лямбды
+    print_phone_number("Ivanov");
+    print_phone_number("Petrov");
+
+    cout << "----ChangePhoneNumber----" << endl;
+    book.ChangePhoneNumber(Person{ "Kotov", "Vasilii", "Eliseevich" },
+                           PhoneNumber{7, 123, "15344458", nullopt});
+    book.ChangePhoneNumber(Person{ "Mironova", "Margarita", "Vladimirovna" },
+                           PhoneNumber{ 16, 465, "9155448", 13 });
+    cout << book;
 }
