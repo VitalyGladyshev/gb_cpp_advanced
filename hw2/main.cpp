@@ -46,42 +46,65 @@ void PrintVecPtrs(const vector<int *> &vecPtrs)
     cout << endl;
 }
 
-//count_if и find
-void CntFind(string& s)
-{
-    int counter = 0;
-    Timer timer("\tПодсчёт гласных count_if и find");
+const vector<uint8_t> vowels {192, 224, 197, 229, 200, 201, 232, 233, 168, 184, 206, 238, 211, 243, 221, 253, 222,
+                              254, 223, 255};
 
+bool find_vowels(const char& ch)
+{
+    auto res = find(vowels.begin(), vowels.end(), static_cast<uint8_t>(ch));
+    if (res != vowels.end())
+        return true;
+    else
+        return false;
+}
+
+bool for_vowels(const char& ch)
+{
+    for (const auto& test_ch : vowels)
+        if (test_ch == static_cast<uint8_t>(ch))
+            return true;
+    return false;
+}
+
+//count_if и find
+void CntFind(const string& s)
+{
+    Timer timer("\tПодсчёт гласных count_if и find");
+    auto counter = count_if(s.begin(), s.end(), find_vowels);
     timer.print();
     cout << "\t\tГласных: " << counter << endl << endl;
 }
 
 //count_if и цикл for
-void CntFor(string& s)
+void CntFor(const string& s)
 {
-    int counter = 0;
     Timer timer("\tПодсчёт гласных count_if и цикл for");
-
+    auto counter = count_if(s.begin(), s.end(), for_vowels);
     timer.print();
     cout << "\t\tГласных: " << counter << endl << endl;
 }
 
 //цикл for и find
-void ForFind(string& s)
+void ForFind(const string& s)
 {
     int counter = 0;
     Timer timer("\tПодсчёт гласных цикл for и find");
-
+    for (const auto& letter: s)
+        if (find_vowels(letter))
+            counter++;
     timer.print();
     cout << "\t\tГласных: " << counter << endl << endl;
 }
 
 //2 цикла for
-void ForFor(string& s)
+void ForFor(const string& s)
 {
     int counter = 0;
     Timer timer("\tПодсчёт гласных 2 цикла for");
-
+    for (const auto& letter: s)
+        for (const auto& test_ch : vowels)
+            if (test_ch == static_cast<uint8_t>(letter))
+                counter++;
     timer.print();
     cout << "\t\tГласных: " << counter << endl << endl;
 }
@@ -138,7 +161,7 @@ int main() {
     cout << "Задание 3" << endl;
 
     Timer timer_fl("\t\tЗагрузка файла");
-    ifstream file_load("C:\\Users\\glvv2\\CLionProjects\\gb_cpp_advanced\\hw2\\voyna-i-mir-tom-1_.txt");
+    ifstream file_load("C:\\Users\\glvv2\\CLionProjects\\gb_cpp_advanced\\hw2\\voyna-i-mir-tom-1.txt");
     file_load.seekg(0, std::ios::end);
     size_t file_size = file_load.tellg();
     file_load.seekg(0);
@@ -146,8 +169,8 @@ int main() {
     file_load.read(&s[0], file_size);
     file_load.close();
 
-    cout << "\tФайл voyna-i-mir-tom-1_.txt размер: " << file_size << " байт" << endl;
-    cout << "\t\t" << s.substr(0, 42) << "..." << endl;
+    cout << "\tФайл voyna-i-mir-tom-1.txt размер: " << file_size << " байт" << endl;
+//    cout << "\t\t" << s.substr(0, 42) << "..." << endl;
     timer_fl.print();
     cout << endl;
 
