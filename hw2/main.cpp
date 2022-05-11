@@ -8,6 +8,7 @@
 #include <chrono>
 #include <vector>
 #include <algorithm>
+#include <fstream>
 
 using namespace std;
 
@@ -95,5 +96,15 @@ int main() {
 // Задание 3
     cout << "Задание 3" << endl;
 
+    ifstream file_load("C:\\Users\\glvv2\\CLionProjects\\gb_cpp_advanced\\hw2\\voyna-i-mir-tom-1_.txt");
+    file_load.seekg(0, std::ios::end);
+    size_t file_size = file_load.tellg();
+    file_load.seekg(0);
+    string s(file_size, ' ');
+    file_load.read(&s[0], file_size);
+    file_load.close();
+
+    cout << "\tФайл voyna-i-mir-tom-1_.txt размер: " << file_size << " байт" << endl;
+    cout << "\t\t" << s.substr(0, 42) << "..." << endl;
 
 }
