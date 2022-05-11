@@ -9,6 +9,7 @@
 #include <vector>
 #include <algorithm>
 #include <fstream>
+#include "Timer.h"
 
 using namespace std;
 
@@ -43,6 +44,46 @@ void PrintVecPtrs(const vector<int *> &vecPtrs)
     for(const auto& ptr : vecPtrs)
         cout << *ptr << " ";
     cout << endl;
+}
+
+//count_if и find
+void CntFind(string& s)
+{
+    int counter = 0;
+    Timer timer("\tПодсчёт гласных count_if и find");
+
+    timer.print();
+    cout << "\t\tГласных: " << counter << endl << endl;
+}
+
+//count_if и цикл for
+void CntFor(string& s)
+{
+    int counter = 0;
+    Timer timer("\tПодсчёт гласных count_if и цикл for");
+
+    timer.print();
+    cout << "\t\tГласных: " << counter << endl << endl;
+}
+
+//цикл for и find
+void ForFind(string& s)
+{
+    int counter = 0;
+    Timer timer("\tПодсчёт гласных цикл for и find");
+
+    timer.print();
+    cout << "\t\tГласных: " << counter << endl << endl;
+}
+
+//2 цикла for
+void ForFor(string& s)
+{
+    int counter = 0;
+    Timer timer("\tПодсчёт гласных 2 цикла for");
+
+    timer.print();
+    cout << "\t\tГласных: " << counter << endl << endl;
 }
 
 int main() {
@@ -96,6 +137,7 @@ int main() {
 // Задание 3
     cout << "Задание 3" << endl;
 
+    Timer timer_fl("\t\tЗагрузка файла");
     ifstream file_load("C:\\Users\\glvv2\\CLionProjects\\gb_cpp_advanced\\hw2\\voyna-i-mir-tom-1_.txt");
     file_load.seekg(0, std::ios::end);
     size_t file_size = file_load.tellg();
@@ -106,5 +148,15 @@ int main() {
 
     cout << "\tФайл voyna-i-mir-tom-1_.txt размер: " << file_size << " байт" << endl;
     cout << "\t\t" << s.substr(0, 42) << "..." << endl;
+    timer_fl.print();
+    cout << endl;
 
+    //count_if и find
+    CntFind(s);
+    //count_if и цикл for
+    CntFor(s);
+    //цикл for и find
+    ForFind(s);
+    //2 цикла for
+    ForFor(s);
 }
