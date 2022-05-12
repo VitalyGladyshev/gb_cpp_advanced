@@ -7,6 +7,7 @@
 #include <iostream>
 #include <random>
 #include <list>
+#include <array>
 #include "..\\Timer.h"
 
 using namespace std;
@@ -40,6 +41,22 @@ void PushMean(list<T>& sourceList)
     sourceList.push_back(counter/sourceList.size());
 }
 
+template<typename T>
+class MyIter
+{
+public:
+    MyIter() {};
+    MyIter(T& val) { Ptr = &val; };
+
+    void operator=(T val) { *Ptr = val; }
+    T operator*() { return *Ptr; }
+    void operator++() { Ptr++; }
+    void operator++(int val) { Ptr++; }
+
+private:
+    T* Ptr;
+};
+
 int main()
 {
 
@@ -68,4 +85,19 @@ int main()
 // Задание 3
     cout << "Задание 3" << endl;
 
+    double arrayDouble[] = {23.45, 45.67, 45.67, 78.56, 34.56};
+
+    cout << "\t";
+    for (MyIter it: arrayDouble)
+        cout << *it << " ";
+    cout << endl;
+
+    MyIter it1(*arrayDouble);
+    it1++;
+    it1 = 10;
+
+    cout << "\t";
+    for (MyIter it: arrayDouble)
+        cout << *it << " ";
+    cout << endl;
 }
