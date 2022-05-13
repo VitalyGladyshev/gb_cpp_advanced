@@ -8,6 +8,8 @@
 #include <random>
 #include <list>
 #include <array>
+#include <ostream>
+#include <iomanip>
 #include "..\\Timer.h"
 
 using namespace std;
@@ -57,6 +59,53 @@ private:
     T* Ptr;
 };
 
+//Класс Квадратная матрица SqureMatrix
+template<typename T>
+class SquareMatrix
+{
+public:
+    //Конструктор
+    SquareMatrix(/*uint32_t matrixSize*/) : _matrixSize(3)
+    {
+        auto seed = std::chrono::system_clock::now().time_since_epoch().count();
+
+        uniform_real_distribution<double> uniform(0, 10);
+        default_random_engine re(seed);
+
+        for (int i = 0; i < _matrixSize; i++)
+        {
+            vector<T> line;
+            for (int j = 0; j < _matrixSize; j++)
+                line.push_back(static_cast<T>(uniform(re)));
+            _matrix.push_back(line);
+        }
+    };
+
+    //Вычисляем определитель
+    double GetDeterminant()
+    {
+
+        return 0;
+    }
+
+    //Перегрузка оператора вывода
+    friend ostream& operator<< (ostream& os, const SquareMatrix& myMatrix)
+    {
+        for (int i = 0; i < myMatrix._matrix.size(); i++)
+        {
+            os << "\t";
+            for (int j = 0; j < myMatrix._matrix[i].size(); j++)
+                os << setprecision(3) << myMatrix._matrix[i][j] << "\t";
+            os << endl;
+        }
+        return os;
+    }
+
+private:
+    uint32_t _matrixSize;
+    vector<vector<T>> _matrix;
+};
+
 int main()
 {
 
@@ -79,6 +128,9 @@ int main()
 
 // Задание 2
     cout << "Задание 2" << endl;
+
+    SquareMatrix<double> myMatrix;
+    cout << myMatrix;
 
     cout << endl;
 
