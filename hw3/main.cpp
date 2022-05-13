@@ -65,7 +65,7 @@ class SquareMatrix
 {
 public:
     //Конструктор
-    SquareMatrix(/*uint32_t matrixSize*/) : _matrixSize(3)
+    SquareMatrix(uint32_t matrixSize) : _matrixSize(matrixSize)
     {
         auto seed = std::chrono::system_clock::now().time_since_epoch().count();
 
@@ -79,13 +79,45 @@ public:
                 line.push_back(static_cast<T>(uniform(re)));
             _matrix.push_back(line);
         }
-    };
+    }
+    //Конструктор копирования
+    SquareMatrix(const SquareMatrix& detMatrix, int raw, int column)
+    {
+        for (int i = 0; i < detMatrix._matrixSize; i++)
+            if(i != raw)
+            {
+                vector<T> line;
+                for (int j = 0; j < detMatrix._matrixSize; j++)
+                    if (j != column)
+                        line.push_back(detMatrix._matrix[i][j]);
+                _matrix.push_back(line);
+            }
+        _matrixSize = _matrix.size();
+    }
 
     //Вычисляем определитель
     double GetDeterminant()
     {
-
-        return 0;
+        double determinant = 0;
+        if (_matrixSize < 1)
+            return 0;
+        else if (_matrixSize == 1)
+            return static_cast<double>(_matrix[0][0]);
+        else if (_matrixSize == 2)
+            return static_cast<double>(_matrix[0][0] * _matrix[1][1] - _matrix[1][0] * _matrix[0][1]);
+        else
+        {
+            int sign = 1;
+            for(int i = 0; i < _matrixSize; i++)
+            {
+                SquareMatrix minor(*this, 0, i);
+//                cout << endl << "\tМинор " << i+1 << endl << minor
+//                    << "\tДетерминант: " << minor.GetDeterminant() << endl;
+                determinant += sign*_matrix[0][i] * minor.GetDeterminant();
+                sign = -sign;
+            }
+        }
+        return determinant;
     }
 
     //Перегрузка оператора вывода
@@ -95,20 +127,19 @@ public:
         {
             os << "\t";
             for (int j = 0; j < myMatrix._matrix[i].size(); j++)
-                os << setprecision(3) << myMatrix._matrix[i][j] << "\t";
+                os << setw(8) << left << setprecision(3) << myMatrix._matrix[i][j];
             os << endl;
         }
         return os;
     }
 
+    vector<vector<T>> _matrix;  //контейнер с матрицей
 private:
-    uint32_t _matrixSize;
-    vector<vector<T>> _matrix;
+    uint32_t _matrixSize;       //размер матрицы
 };
 
 int main()
 {
-
     setlocale(LC_ALL, "Russian");
 // Задание 1
     cout << "Задание 1" << endl;
@@ -129,17 +160,25 @@ int main()
 // Задание 2
     cout << "Задание 2" << endl;
 
-    SquareMatrix<double> myMatrix;
+    Timer timerMatrix("\tМатрица 5х5");
+    SquareMatrix<int> myMatrix(5);
     cout << myMatrix;
-
+    double det = myMatrix.GetDeterminant();
+    cout << "\tОпределитель матрицы: " << setprecision(8) << det << endl;
+    timerMatrix.print();
     cout << endl;
+
+    SquareMatrix<double> newMatrix(3);
+    cout << newMatrix;
+    det = newMatrix.GetDeterminant();
+    cout << "\tОпределитель матрицы: "  << setprecision(8) << det << endl << endl;
 
 // Задание 3
     cout << "Задание 3" << endl;
 
     double arrayDouble[] = {23.45, 45.67, 45.67, 78.56, 34.56};
 
-    cout << "\t";
+    cout << "\t" << setprecision(4);
     for (MyIter it: arrayDouble)
         cout << *it << " ";
     cout << endl;
