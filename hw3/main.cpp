@@ -7,7 +7,6 @@
 #include <iostream>
 #include <random>
 #include <list>
-#include <array>
 #include <ostream>
 #include <iomanip>
 #include "..\\Timer.h"
