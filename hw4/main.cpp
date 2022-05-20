@@ -9,6 +9,7 @@
 #include <deque>
 #include <list>
 #include <random>
+#include <algorithm>
 #include "..\\Timer.h"
 
 using namespace std;
@@ -76,14 +77,23 @@ int main() {
 
 // Задание 2
     cout << "Задание 2" << endl;
-    vector<double> parameter_1;
-    vector<double> parameter_1_discretized;
-    for (int i = 0 ; i < 100; i++)
-    {
-        parameter_1.push_back(randDouble(0, 100));
-        parameter_1_discretized.push_back(trunc(parameter_1[i]));
-    }
-    print_container(parameter_1);
-    print_container(parameter_1_discretized);
+    vector<double> parameter(100);
+    vector<double> parameter_discretized;
+    generate(parameter.begin(), parameter.end(),
+             [](){return (randDouble(0, 100));});
+    for_each(parameter.begin(), parameter.end(),
+             [&parameter_discretized](double d){ parameter_discretized.push_back(trunc(d)); });
 
+    print_container(parameter);
+    print_container(parameter_discretized);
+
+    transform(parameter.begin(), parameter.end(), parameter_discretized.begin(),
+              parameter_discretized.begin(), //back_inserter(temp),
+              minus<double>());
+    transform(parameter_discretized.begin(), parameter_discretized.end(), parameter_discretized.begin(),
+              [](double x) {return x * x; });
+//    print_container(parameter_discretized);
+
+    cout << "\tОшибка: " << accumulate(parameter_discretized.begin(), parameter_discretized.end(),
+                                       static_cast<double>(0)) << endl;
 }
