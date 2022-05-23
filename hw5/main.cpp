@@ -66,8 +66,16 @@ int main() {
 // Задание 2
     cout << "Задание 2" << endl;
 
-//    ifstream file_load("C:\\Users\\glvv2\\CLionProjects\\gb_cpp_advanced\\hw2\\voyna-i-mir-tom-1.txt");
-//    string text;
+    string text;
+    cout << "\tВведите набор предложений. Для завершения введите: стоп" << endl;
+    cout << "\t#:> ";
+    while(cin >> text)
+    {
+        if (text == "стоп")
+            break;
+        cout << text << endl;
+    }
+
 //    map<string, int> mapCount;
 //    while(file_load >> text)
 //        ++mapCount[text];
