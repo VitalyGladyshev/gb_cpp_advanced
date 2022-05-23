@@ -66,28 +66,33 @@ int main() {
 // Задание 2
     cout << "Задание 2" << endl;
 
-    string text;
+    string text, sentence;
+    int wordCount = 0;
     cout << "\tВведите набор предложений. Для завершения введите: стоп" << endl;
     cout << "\t#:> ";
+    map<int, list<string>> mapCount;
+
     while(cin >> text)
     {
         if (text == "стоп")
             break;
-        cout << text << endl;
+        sentence += " ";
+        sentence += text;
+        wordCount++;
+        if (text.back() == '.' || text.back() == '!' || text.back() == '?')
+        {
+            cout << "\tСлов " << wordCount << ": " << sentence << endl;
+            mapCount[wordCount].push_back(sentence);
+            sentence.clear();
+            wordCount = 0;
+        }
     }
 
-//    map<string, int> mapCount;
-//    while(file_load >> text)
-//        ++mapCount[text];
-//
-//    auto it = mapCount.begin();
-//    for (int i=0; i < 600; i++)
-//        it++;
-//    for(int i=0; i < 20; i++)
-//    {
-//        cout << it->first << " " << it->second << endl;
-//        it++;
-//    }
-
-    cout << endl;
+    for (const auto& [number, sentenceList]: mapCount)
+    {
+        cout << "\tСлов: " << number << " Предложений: " << sentenceList.size() << endl;
+        for (const auto& sentence: sentenceList)
+            cout << "\t\t" << sentence << endl;
+        cout << endl;
+    }
 }
