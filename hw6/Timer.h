@@ -37,4 +37,7 @@ public:
     void print() const {
         std::cout << m_name << ":\t" << elapsed() * 1000 << " ms" << '\n';
     }
+    double elaps() const {
+        return elapsed() * 1000;
+    }
 };

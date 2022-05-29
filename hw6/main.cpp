@@ -11,7 +11,9 @@
 #include <thread>
 #include <mutex>
 #include <cmath>
+#include <random>
 #include <condition_variable>
+#include <algorithm>
 #include "Timer.h"
 
 using namespace std;
@@ -121,7 +123,50 @@ int GetPrimeNumber(int count)
         return -1;
 }
 
-int main() {
+double randInt(const uint32_t& lower_bound, const uint32_t& upper_bound)
+{
+    auto seed = std::chrono::system_clock::now().time_since_epoch().count();
+
+    uniform_real_distribution<double> uniform(lower_bound,upper_bound);
+    default_random_engine re(seed);
+
+    return static_cast<int>(uniform(re));
+}
+
+vector<int> things;
+void owner()
+{
+    for(int i = 0; i < 60; i++)
+    {
+        this_thread::sleep_for(500ms);
+        lock_guard<mutex> lk(mut);
+        int thing = randInt(0, 1000);
+//        cout << "\tПринёс: " << thing << endl;
+        things.push_back(thing);
+        sort(things.begin(), things.end());
+        data_cond.notify_one();
+    }
+}
+
+void thief()
+{
+    for(int i = 0; i < 30; i++)
+    {
+        this_thread::sleep_for(1000ms);
+        lock_guard<mutex> lk(mut);
+
+        if(things.size())
+        {
+//            cout << "\tУнёс: " << things.back() << endl;
+            things.pop_back();
+        }
+
+        data_cond.notify_one();
+    }
+}
+
+int main()
+{
     setlocale(LC_ALL, "Russian");
 // Задание 1
     cout << "Задание " << endl;
@@ -168,5 +213,27 @@ int main() {
 // Задание 3
     cout << "Задание 3" << endl;
 
+    Timer timerOT("timerOT");
+    thread thO(owner);
+    thread thT(thief);
 
+    size_t thingsSize = 0;
+    while (true)
+    {
+        unique_lock<mutex> lk(mut);
+        data_cond.wait(lk, [&thingsSize] {return thingsSize != things.size(); });
+        thingsSize = things.size();
+        cout << "\tВещи: ";
+        for(const auto th: things)
+            cout << th << " ";
+        cout << "\r";
+//        cout << "\t timerOT.elaps(): " << timerOT.elaps() << endl;
+        cout.flush();
+        lk.unlock();
+        if(timerOT.elaps() > 29500)
+            break;
+    }
+
+    thO.join();
+    thT.join();
 }
