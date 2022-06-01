@@ -16,8 +16,8 @@ int main()
 {
     setlocale(LC_ALL, "Russian");
 // Задание 1
-//    cout << "Задание 1 (ставим и проверяем работоспособность protobuf)" << endl;
-//    cout << "\tCompiled with zlib " << ZLIB_VERSION << " using zlib " << zlib_version << endl;
+    cout << "Задание 1 (ставим и проверяем работоспособность protobuf)" << endl;
+    cout << "\tCompiled with zlib " << ZLIB_VERSION << " using zlib " << zlib_version << endl;
 
 //    Car car;
 //    car.set_brand("Toyota");
