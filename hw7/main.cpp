@@ -27,7 +27,7 @@ public:
     FullName(string firstName, string lastName, string patronymic) :
         _firstName(firstName), _lastName(lastName), _patronymic(patronymic) {}
 
-    void printFullName()
+    void printFullName() const
     {
         cout << "\tФИО: " << _firstName << " " << _lastName << " " << _patronymic << endl;
     }
@@ -58,10 +58,18 @@ public:
     Student() {}
     Student(FullName& fullName, initializer_list<int> marks) : _fullName(fullName), _marks(marks)
     {
-        _marksAverage = accumulate(_marks.begin(), _marks.end(), static_cast<double>(0)) / _marks.size();
+        if(_marks.size())
+            _marksAverage = accumulate(_marks.begin(), _marks.end(), static_cast<double>(0)) / _marks.size();
+        else
+            _marksAverage = 0;
     }
 
-    void printStudent()
+    double GetAverage() const
+    {
+        return _marksAverage;
+    }
+
+    void printStudent() const
     {
         _fullName.printFullName();
         cout << "\t\tСредний балл: " << _marksAverage << endl;
@@ -85,16 +93,16 @@ public:
 
 //Интерфейсы
 class IRepository {
-    virtual void Open() = 0; // бинарная десериализация в файл virtual void Save() = 0; // бинарная сериализация в файл
+    virtual void Open(string fileName) = 0; // бинарная десериализация в файл
+    virtual void Save(string fileName) = 0; // бинарная сериализация в файл
 };
 
 class IMethods {
-    virtual double GetAverageScore(const FullName& name) = 0;
-    virtual string GetAllInfo(const FullName& name) = 0;
-    virtual string GetAllInfo() = 0;
+    virtual double GetAverageScore() = 0;
+    virtual void GetAllInfo() = 0;
 };
 
-class StudentsGroup
+class StudentsGroup : public IRepository //, IMethods
 {
     vector<Student> _students;
 
@@ -102,15 +110,27 @@ public:
     StudentsGroup() {}
     StudentsGroup(initializer_list<Student> students) : _students(students) {}
 
-    void printStudent()
+    virtual double GetAverageScore() const
+    {
+        double average = 0;
+        for(const auto& student : _students)
+            average += student.GetAverage();
+        if (_students.size())
+            return average / _students.size();
+        else
+            return 0;
+    }
+
+    virtual void GetAllInfo() const
     {
         cout << "\tСтуденты группы: " << endl;
-        for(auto& student : _students)
+        for(const auto& student : _students)
             student.printStudent();
+        cout << "\tСредний балл группы: " << GetAverageScore() << endl;
         cout << endl;
     }
 
-    void ser(string fileName)
+    virtual void Save(string fileName)
     {
         ofstream WF(fileName, ios::binary);
         char* D = reinterpret_cast<char*>(this);
@@ -118,7 +138,7 @@ public:
         WF.close();
     }
 
-    void deser(string fileName)
+    virtual void Open(string fileName)
     {
         ifstream RF(fileName, ios::binary);
         RF.read(reinterpret_cast<char*>(this), sizeof(*this));
@@ -130,8 +150,8 @@ int main()
 {
     setlocale(LC_ALL, "Russian");
 // Задание 1
-    cout << "Ставим и проверяем работоспособность protobuf" << endl;
-    cout << "\tCompiled with zlib " << ZLIB_VERSION << " using zlib " << zlib_version << endl;
+    cout << "\tСтавим и проверяем работоспособность protobuf" << endl;
+    cout << "\t\tCompiled with zlib " << ZLIB_VERSION << " using zlib " << zlib_version << endl;
 
 //    Car car;
 //    car.set_brand("Toyota");
@@ -157,11 +177,11 @@ int main()
     cout << endl;
 
     StudentsGroup group({studentIvan, studentPetr});
-    group.ser("Group.dat");
+    group.Save("Group.dat");
 
     StudentsGroup groupX;
-    groupX.deser("Group.dat");
-    groupX.printStudent();
+    groupX.Open("Group.dat");
+    groupX.GetAllInfo();
 
     return 0;
 }
