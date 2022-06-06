@@ -98,11 +98,11 @@ class IRepository {
 };
 
 class IMethods {
-    virtual double GetAverageScore() = 0;
-    virtual void GetAllInfo() = 0;
+    virtual double GetAverageScore() const = 0;
+    virtual void GetAllInfo() const = 0;
 };
 
-class StudentsGroup : public IRepository //, IMethods
+class StudentsGroup : public IRepository, IMethods
 {
     vector<Student> _students;
 

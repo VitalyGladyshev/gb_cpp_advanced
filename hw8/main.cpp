@@ -5,10 +5,12 @@
 //
 
 #include <algorithm>
+#include <string>
 #include <numeric>
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <gtest/gtest.h>
 
 using namespace std;
 
@@ -25,9 +27,11 @@ public:
     FullName(string firstName, string lastName, string patronymic) :
             _firstName(firstName), _lastName(lastName), _patronymic(patronymic) {}
 
-    void printFullName() const
+    string printFullName() const
     {
-        cout << "\tФИО: " << _firstName << " " << _lastName << " " << _patronymic << endl;
+        ostringstream os;
+        os << "\tФИО: " << _firstName << " " << _lastName << " " << _patronymic << endl;
+        return os.str();
     }
 
     void ser(string fileName)
@@ -67,10 +71,12 @@ public:
         return _marksAverage;
     }
 
-    void printStudent() const
+    string printStudent() const
     {
-        _fullName.printFullName();
-        cout << "\t\tСредний балл: " << _marksAverage << endl;
+        ostringstream os;
+        os << _fullName.printFullName();
+        os << "\t\tСредний балл: " << _marksAverage << endl;
+        return os.str();
     }
 
     void ser(string fileName)
@@ -96,11 +102,11 @@ class IRepository {
 };
 
 class IMethods {
-    virtual double GetAverageScore() = 0;
-    virtual void GetAllInfo() = 0;
+    virtual double GetAverageScore() const = 0;
+    virtual string GetAllInfo() const = 0;
 };
 
-class StudentsGroup : public IRepository //, IMethods
+class StudentsGroup : public IRepository, IMethods
 {
     vector<Student> _students;
 
@@ -119,13 +125,15 @@ public:
             return 0;
     }
 
-    virtual void GetAllInfo() const
+    virtual string GetAllInfo() const
     {
-        cout << "\tСтуденты группы: " << endl;
+        ostringstream os;
+        os << "\tСтуденты группы: " << endl;
         for(const auto& student : _students)
-            student.printStudent();
-        cout << "\tСредний балл группы: " << GetAverageScore() << endl;
-        cout << endl;
+            os << student.printStudent();
+        os << "\tСредний балл группы: " << GetAverageScore() << endl;
+        os << endl;
+        return os.str();
     }
 
     virtual void Save(string fileName)
@@ -144,6 +152,47 @@ public:
     }
 };
 
+class TestDate : public testing::Test{
+protected:
+    void SetUp() override
+    {
+        pIvan = new FullName("Иванов"s, "Иван"s, "Иванович"s);
+        pPetr = new FullName("Петров"s, "Пётр"s, "Петрович"s);
+        pStudentIvan = new Student(*pIvan, {4, 5, 3, 4, 5, 3, 4, 5});
+        pStudentPetr = new Student(*pPetr, {5, 4, 5, 4, 5, 3, 5, 5});
+        pGroup = new StudentsGroup({*pStudentIvan, *pStudentPetr});
+    }
+
+    void TearDown() override
+    {
+        delete pIvan;
+        delete pPetr;
+        delete pStudentIvan;
+        delete pStudentPetr;
+        delete pGroup;
+    }
+
+    FullName *pIvan;
+    FullName *pPetr;
+    Student *pStudentIvan;
+    Student *pStudentPetr;
+    StudentsGroup *pGroup;
+};
+
+TEST_F(TestDate, average)
+{
+    ASSERT_DOUBLE_EQ(pGroup->GetAverageScore(), 4.3125);
+}
+
+TEST_F(TestDate, names)
+{
+    ostringstream os;
+    os << "\tФИО: Иванов Иван Иванович" << endl;
+
+    ASSERT_STREQ(os.str().c_str(),
+                 pIvan->printFullName().c_str()) << "you'll see this in case of an error";
+}
+
 int main()
 {
     setlocale(LC_ALL, "Russian");
@@ -155,17 +204,15 @@ int main()
     Student studentPetr(petr, {5, 4, 5, 4, 5, 3, 5, 5});
 
     studentIvan.ser("Ivan.dat");
-    Student studentX;
-    studentX.deser("Ivan.dat");
-    studentX.printStudent();
+    cout << studentIvan.printStudent();
+    cout << endl;
+    cout << studentPetr.printStudent();
     cout << endl;
 
     StudentsGroup group({studentIvan, studentPetr});
     group.Save("Group.dat");
+    cout << group.GetAllInfo();
 
-    StudentsGroup groupX;
-    groupX.Open("Group.dat");
-    groupX.GetAllInfo();
-
-    return 0;
+    testing::InitGoogleTest();
+    return RUN_ALL_TESTS();
 }
